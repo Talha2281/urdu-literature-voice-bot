@@ -7,6 +7,7 @@ import whisper
 from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
 from txtai.embeddings import Embeddings
+from streamlit_audio_recorder import audio_recorder
 
 # Load URLs and fetch content
 def load_urls(file_path):
@@ -61,13 +62,15 @@ def text_to_speech(text):
 
 # Streamlit Deployment
 st.title("Urdu Literature Voice Chatbot")
-st.write("Ask questions in Urdu or English by voice!")
+st.write("Record your question in Urdu or English!")
 
-uploaded_file = st.file_uploader("Upload your voice question", type=["wav", "mp3"])
+# Record audio
+recorded_audio = audio_recorder()
 
-if uploaded_file is not None:
-    with tempfile.NamedTemporaryFile(delete=False) as temp_audio_file:
-        temp_audio_file.write(uploaded_file.getvalue())
+if recorded_audio:
+    # Save the recorded audio to a temporary file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio_file:
+        temp_audio_file.write(recorded_audio)
         temp_audio_file_path = temp_audio_file.name
     
     # Transcribe voice input
@@ -87,7 +90,3 @@ if uploaded_file is not None:
     # Clean up temporary files
     os.remove(temp_audio_file_path)
     os.remove(answer_audio_path)
-
-        
-
-
