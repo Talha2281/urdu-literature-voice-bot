@@ -1,10 +1,7 @@
 streamlit
 beautifulsoup4
 requests
-faiss-cpu
 sentence-transformers
 langchain
 pyttsx3
 whisper
-google-cloud-texttospeech
-python
