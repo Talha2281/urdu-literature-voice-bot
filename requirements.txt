@@ -6,4 +6,6 @@ langchain
 pyttsx3
 whisper
 txtai
+streamlit-audio-recorder
+
 
