@@ -5,3 +5,5 @@ sentence-transformers
 langchain
 pyttsx3
 whisper
+txtai
+
