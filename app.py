@@ -6,8 +6,6 @@ from bs4 import BeautifulSoup
 from transformers import pipeline
 from sentence_transformers import SentenceTransformer
 from txtai.embeddings import Embeddings
-from scipy.io.wavfile import write
-import sounddevice as sd
 
 # Load URLs and Fetch Content
 def load_urls(file_path="collected_urls.txt"):
@@ -52,37 +50,26 @@ def retrieve_answer(embeddings, question_text, chunks):
     best_chunk_idx = results[0][0]
     return chunks[best_chunk_idx]
 
-# Audio Recording Function
-def record_audio(duration=5, fs=44100):
-    st.write("Recording for 5 seconds...")
-    recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
-    sd.wait()  # Wait until recording is finished
-    temp_audio_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
-    write(temp_audio_file.name, fs, recording)  # Save as WAV file
-    st.write("Recording complete!")
-    return temp_audio_file.name
-
 # Streamlit App
 st.title("Urdu Literature Voice Chatbot")
-st.write("Click 'Record' to ask your question in Urdu or English!")
+st.write("Upload an audio file (in .wav format) to ask your question in Urdu or English!")
 
 audio_to_text, text_to_audio = load_huggingface_pipelines()
 
-if st.button("Record"):
-    audio_file_path = record_audio()  # Record audio for 5 seconds
-    
-    # Convert Audio to Text
-    with open(audio_file_path, "rb") as audio_file:
-        question_text = audio_to_text(audio_file)["text"]
+# File Uploader for audio input
+uploaded_file = st.file_uploader("Upload a .wav audio file", type=["wav"])
+if uploaded_file is not None:
+    # Convert audio to text
+    question_text = audio_to_text(uploaded_file)["text"]
     st.write("Transcribed question:", question_text)
     
-    # Retrieve Answer
+    # Retrieve answer
     chunks = load_and_chunk_content("collected_urls.txt")
     embeddings = create_txtai_index(chunks)
     answer_text = retrieve_answer(embeddings, question_text, chunks)
     st.write("Answer:", answer_text)
     
-    # Convert Answer Text to Speech
+    # Convert answer text to speech
     answer_audio = text_to_audio(answer_text)
     answer_audio_path = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
     with open(answer_audio_path.name, "wb") as f:
@@ -90,7 +77,7 @@ if st.button("Record"):
     st.audio(answer_audio_path.name)
 
     # Clean up
-    os.remove(audio_file_path)
     os.remove(answer_audio_path.name)
 
+ 
 
