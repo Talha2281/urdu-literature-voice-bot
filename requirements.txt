@@ -1,11 +1,11 @@
+transformers
+huggingface_hub
+soundfile
+sentence-transformers
+txtai
 streamlit
 beautifulsoup4
 requests
-sentence-transformers
-langchain
-pyttsx3
-whisper
-txtai
-streamlit-audio-recorder
+
 
 
